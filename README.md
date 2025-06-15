@@ -21,18 +21,18 @@ O projeto ainda esta em desenvolvimento
 ---
 
 ## Como rodar?
-1. Atualize o ```.env```
 1. Clone o repositório:
 
     ```bash
     git clone https://github.com/seu-usuario/infra-watch.git
     cd infra-watch
     ```
-2. Crie a imagem
+2. Atualize o ```.env```
+3. Crie a imagem
     ```bash
     docker build -t infra-watch .
     ```
-3. Inicie o container
+4. Inicie o container
     ```bash
     docker run -p 8000:8000 infra-watch
     ```
