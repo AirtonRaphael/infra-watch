@@ -2,7 +2,7 @@ FROM python:3.10-slim-bullseye
 
 WORKDIR /app
 
-COPY requirements/requirements.txt .
+COPY requirements.txt .
 
 RUN python -m venv .venv && \
     . .venv/bin/activate && \
