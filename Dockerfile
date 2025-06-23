@@ -18,5 +18,5 @@ RUN apt-get update && apt-get install -y sqlite3 && \
 RUN sqlite3 infra.db < db.sql
 
 WORKDIR api/
-CMD ["../.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/app/.venv/bin/uvicorn", "main:app","--reload", "--host", "0.0.0.0", "--port", "8000"]
 # CMD ["bash"]
