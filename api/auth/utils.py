@@ -18,12 +18,12 @@ def verify_password(password: str, hash: str) -> bool:
 
 
 def decode_jwt(encoded_jwt):
-    return jwt.decode(encoded_jwt, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
+    return jwt.decode(encoded_jwt, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
 
 def create_jwt(secret_key: str, expire_minutes: int, user_id: int, role: str):
     payload = {
-        "sub": user_id,
+        "sub": str(user_id),
         "role": role,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=expire_minutes)
     }

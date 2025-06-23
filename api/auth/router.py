@@ -1,6 +1,5 @@
-from fastapi import APIRouter, HTTPException, Response
-
-from .schema import LoginSchema, CreateUserSchema
+from fastapi import APIRouter, HTTPException
+from .schema import LoginSchema
 from .auth import get_user_by_email
 from .utils import create_jwt, verify_password
 from config import settings
@@ -18,7 +17,7 @@ def login(login: LoginSchema):
     db_user = get_user_by_email(login.email)
     if not db_user:
         raise HTTPException("User does not exist")
-    
+
     if not verify_password(login.password, db_user.hash_password):
         raise HTTPException(status_code=403, detail="Wrong password!")
 
