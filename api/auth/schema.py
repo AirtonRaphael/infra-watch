@@ -3,8 +3,8 @@ from enum import Enum
 
 
 class PermissionEnum(Enum):
-    usuario = "usuario"
-    admin = "admin"
+    usuario = "User"
+    admin = "Admin"
 
 
 class BaseUserSchema(BaseModel):
