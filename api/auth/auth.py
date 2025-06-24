@@ -31,8 +31,8 @@ def create_user(user: CreateUserSchema):
 
     Session = get_session()
     with Session() as session:
-
-        permission = session.query(PermissionsType).filter_by(name=user.permission).first()
+        print(user.permission.value)
+        permission = session.query(PermissionsType).filter_by(permission_type=user.permission.value).first()
 
         if not permission:
             raise ValueError(f"Permissão '{user.permission}' não encontrada.")
