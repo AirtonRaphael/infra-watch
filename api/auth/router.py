@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException
+
+from config import settings
 from .schema import LoginSchema
 from .auth import get_user_by_email
 from .utils import create_jwt, verify_password
-from config import settings
 
 
 router = APIRouter(

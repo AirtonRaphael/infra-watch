@@ -5,9 +5,8 @@ from fastapi.security import HTTPBearer
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
 from sqlalchemy.orm import joinedload
 
-from .models import User, PermissionsType
-from .schema import CreateUserSchema
-from .utils import get_hashed_password, decode_jwt
+from .models import User
+from .utils import decode_jwt
 from database import get_session
 
 
@@ -23,27 +22,6 @@ def get_user_by_email(email: str):
 
     with Session() as session:
         return session.query(User).options(joinedload(User.permission)).filter_by(email=email).first()
-
-
-def create_user(user: CreateUserSchema):
-    hash = get_hashed_password(user.password)
-    db_user = User(username=user.username, email=user.email, hash_password=hash)
-
-    Session = get_session()
-    with Session() as session:
-        print(user.permission.value)
-        permission = session.query(PermissionsType).filter_by(permission_type=user.permission.value).first()
-
-        if not permission:
-            raise ValueError(f"Permissão '{user.permission}' não encontrada.")
-
-        db_user.permission = permission
-
-        session.add(db_user)
-        session.commit()
-        session.refresh(db_user)
-
-    return db_user
 
 
 class JwtBearer(HTTPBearer):
