@@ -3,25 +3,19 @@ from typing import Optional
 from fastapi import Request, HTTPException, Depends, status
 from fastapi.security import HTTPBearer
 from jwt.exceptions import ExpiredSignatureError, PyJWTError
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, Session
 
 from .models import User
 from .utils import decode_jwt
-from database import get_session
 
 
-def get_user_by_id(user_id: int):
-    Session = get_session()
+def get_user_by_id(session: Session, user_id: int):
 
-    with Session() as session:
-        return session.query(User).options(joinedload(User.permission)).filter_by(user_id=user_id).first()
+    return session.query(User).options(joinedload(User.permission)).filter_by(user_id=user_id).first()
 
 
-def get_user_by_email(email: str):
-    Session = get_session()
-
-    with Session() as session:
-        return session.query(User).options(joinedload(User.permission)).filter_by(email=email).first()
+def get_user_by_email(session: Session, email: str):
+    return session.query(User).options(joinedload(User.permission)).filter_by(email=email).first()
 
 
 class JwtBearer(HTTPBearer):
@@ -62,7 +56,7 @@ def get_payload(token: str = Depends(JwtBearer())) -> User:
     return payload
 
 
-def admin_permission(payload=Depends(get_payload)):
+def admin_permission(payload = Depends(get_payload)):
     if payload.get('role', '') != "Admin":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid permission')
 

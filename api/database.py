@@ -16,4 +16,9 @@ def start_db() -> None:
 
 
 def get_session():
+    with SessionLocal() as session:
+        yield session
+
+
+def get_closed_session():
     return SessionLocal

@@ -23,4 +23,4 @@ class User(Base):
 
     @property
     def permission_str(self) -> str:
-        return self.permission.permission_type if self.permission else None
+        return self.permission.permission_type if self.permission else ""

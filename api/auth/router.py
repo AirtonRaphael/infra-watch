@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from config import settings
+from database import get_session
 from .schema import LoginSchema
 from .auth import get_user_by_email
 from .utils import create_jwt, verify_password
@@ -13,9 +14,8 @@ router = APIRouter(
 
 
 @router.post("/login")
-def login(login: LoginSchema):
-
-    db_user = get_user_by_email(login.email)
+def login(login: LoginSchema, session=Depends(get_session)):
+    db_user = get_user_by_email(session, login.email)
     if not db_user:
         raise HTTPException("User does not exist")
 

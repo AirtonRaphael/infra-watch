@@ -1,71 +1,64 @@
-from fastapi import HTTPException
-from sqlalchemy.orm import joinedload
+from fastapi import HTTPException, status
+from sqlalchemy.orm import joinedload, Session
 
-from database import get_session
 from auth.models import User, PermissionsType
 from auth.utils import get_hashed_password
+from auth.auth import get_user_by_email
 from .schema import CreateUserSchema, UpdateUserSchema
 
 
-def get_users():
-    Session = get_session()
-
-    with Session() as session:
-        return session.query(User).options(joinedload(User.permission)).all()
+def get_users(session: Session):
+    return session.query(User).options(joinedload(User.permission)).all()
 
 
-def create_user(user: CreateUserSchema):
+def create_user(session: Session, user: CreateUserSchema):
     hash = get_hashed_password(user.password)
+
+    user = get_user_by_email(session, user.email)
+    if user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already exists')
+
     db_user = User(username=user.username, email=user.email, hash_password=hash)
 
-    Session = get_session()
-    with Session() as session:
-        permission = session.query(PermissionsType).filter_by(permission_type=user.permission.value).first()
+    permission = session.query(PermissionsType).filter_by(permission_type=user.permission.value).first()
+    if not permission:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Permission '{user.permission}' not found")
 
-        if not permission:
-            raise ValueError(f"Permissão '{user.permission}' não encontrada.")
+    db_user.permission = permission
 
-        db_user.permission = permission
-
-        session.add(db_user)
-        session.commit()
-        session.refresh(db_user)
+    session.add(db_user)
+    session.commit()
+    session.refresh(db_user)
 
     return db_user
 
 
-def delete_user(target_user_id):
-    Session = get_session()
+def delete_user(session: Session, target_user_id: int):
+    user = session.query(User).filter_by(user_id=target_user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    with Session() as session:
-        user = session.query(User).filter_by(user_id=target_user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        user.delete()
-        session.commit()
+    user.delete()
+    session.commit()
 
     return
 
 
-def update_user(updated_user: UpdateUserSchema):
-    Session = get_session()
+def update_user(session: Session, updated_user: UpdateUserSchema):
+    db_user = session.query(User).filter_by(user_id=updated_user.user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    with Session() as session:
-        db_user = session.query(User).filter_by(user_id=updated_user.user_id).first()
-        if not db_user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        permission = session.query(PermissionsType).filter_by(permission_type=updated_user.permission.value).first()
-        if not permission:
-            raise HTTPException(status_code=400, detail="Invalid permission")
+    permission = session.query(PermissionsType).filter_by(permission_type=updated_user.permission.value).first()
+    if not permission:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid permission")
 
 
-        db_user.username = updated_user.username
-        db_user.email = updated_user.email
-        db_user.permission = permission
+    db_user.username = updated_user.username
+    db_user.email = updated_user.email
+    db_user.permission = permission
 
-        session.commit()
+    session.commit()
+    session.refresh(db_user)
     
-    return updated_user
-
+    return db_user
