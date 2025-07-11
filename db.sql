@@ -25,3 +25,13 @@ VALUES (
     'admin@admin.com',
     (SELECT permission_id FROM PermissionType WHERE permission_type = 'Admin')
 );
+
+-- hosts
+CREATE TABLE Hosts (
+    host_id INTEGER PRIMARY KEY,
+    label VARCHAR(255) UNIQUE NOT NULL,
+    endpoint NVARCHAR(255) NOT NULL
+);
+
+
+-- Logs
