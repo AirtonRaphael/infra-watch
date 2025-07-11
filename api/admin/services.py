@@ -14,8 +14,8 @@ def get_users(session: Session):
 def create_user(session: Session, user: CreateUserSchema):
     hash = get_hashed_password(user.password)
 
-    user = get_user_by_email(session, user.email)
-    if user:
+    db_user = get_user_by_email(session, user.email)
+    if db_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already exists')
 
     db_user = User(username=user.username, email=user.email, hash_password=hash)
@@ -38,7 +38,7 @@ def delete_user(session: Session, target_user_id: int):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    user.delete()
+    session.delete(user)
     session.commit()
 
     return
