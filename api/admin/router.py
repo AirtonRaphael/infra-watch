@@ -13,28 +13,28 @@ router = APIRouter(
 
 
 @router.get("/users", response_model=list[UserResponse])
-def list_users(req_user = Depends(auth.admin_permission), session = Depends(get_session)):
+def list_users(token=Depends(auth.admin_permission), session=Depends(get_session)):
     users = services.get_users(session)
 
     return [UserResponse.from_orm(u) for u in users]
 
 
 @router.post("/create_user", response_model=UserResponse)
-def create_user(new_user: CreateUserSchema, req_user = Depends(auth.admin_permission), session = Depends(get_session)):
+def create_user(new_user: CreateUserSchema, token=Depends(auth.admin_permission), session=Depends(get_session)):
     user = services.create_user(session, new_user)
 
     return UserResponse.from_orm(user)
 
 
 @router.delete("/delete_user")
-def delete_user(user_id: int, req_user=Depends(auth.admin_permission), session = Depends(get_session)):
+def delete_user(user_id: int, token=Depends(auth.admin_permission), session=Depends(get_session)):
     services.delete_user(session, user_id)
 
     return
 
 
 @router.post("/update_user", response_model=UserResponse)
-def update_user(updated_user: UpdateUserSchema, req_user = Depends(auth.admin_permission), session = Depends(get_session)):
+def update_user(updated_user: UpdateUserSchema, token=Depends(auth.admin_permission), session=Depends(get_session)):
     user = services.update_user(session, updated_user)
 
     return user

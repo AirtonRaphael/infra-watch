@@ -27,36 +27,30 @@ class JwtBearer(HTTPBearer):
         credential = await super(JwtBearer, self).__call__(request)
         if not credential:
             raise HTTPException(status_code=403, detail="Invalid authorization code")
-        
+
         if not credential.scheme == "Bearer":
             raise HTTPException(status_code=403, detail="Invalid authentication scheme.")
-        
+
         token = credential.credentials
 
-        if not self.validate_jwt(token):
+        payload = self.validate_jwt(token)
+        if not payload:
             raise HTTPException(status_code=403, detail="Invalid token")
-        
-        return token
 
-    def validate_jwt(self, jwt_token: str) -> bool:
+        print(payload)
+
+        return payload
+
+    def validate_jwt(self, jwt_token: str) -> object | None:
         try:
-            decode_jwt(jwt_token)
-            return True
+            return decode_jwt(jwt_token)
         except ExpiredSignatureError:
-            return False
+            return
         except PyJWTError:
-            return False
+            return
 
 
-def get_payload(token: str = Depends(JwtBearer())) -> User:
-    payload = decode_jwt(token)
-    if not payload:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token or expired token"')
-
-    return payload
-
-
-def admin_permission(payload = Depends(get_payload)):
+def admin_permission(payload=Depends(JwtBearer())) -> object:
     if payload.get('role', '') != "Admin":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid permission')
 
