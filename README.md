@@ -6,21 +6,22 @@
 
 ## Funcionalidades
 
-- Cadastro e gerenciamento de endpoints para monitoramento (em desenvolvimento)
-- Verificação automática do status dos sites/endpoints cadastrados (em desenvolvimento)
-- Dashboard simples para visualização dos resultados (em desenvolvimento)
+- Cadastro e gerenciamento de endpoints para monitoramento
+- Verificação automática do status dos sites/endpoints cadastrados
 - Sistema de autenticação com JWT
-- API RESTful para integração com clientes externos, incluindo CLI (em desenvolvimento)
+- Notificação de ocorrencias via email ou whatsapp (em desenvolvimento)
+- Sistema de log de ocorrencias (em desenvolvimento)
+- Consumo do log de ocorrencias (em desenvolvimento)
+- CLI para consumo da API (em desenvolvimento)
 
 ---
 
 ## Status do Projeto
 
-O projeto ainda esta em desenvolvimento
-
+O projeto esta em desenvolvimento mas usavel via swagger
 ---
 
-## Como rodar?
+## Como rodar
 1. Clone o repositório:
 
     ```bash
